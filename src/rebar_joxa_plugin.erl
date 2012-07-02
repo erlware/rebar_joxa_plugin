@@ -35,8 +35,17 @@
 %% Public API
 %% ===================================================================
 -spec compile(rebar_config:config(), file:filename()) -> term().
-compile(Config, _AppFile) ->
-    build_jxa(Config, "src", "ebin").
+compile(Config, AppFile) ->
+    {ok, [{application, AppName, _}]} = file:consult(AppFile),
+    %% Never try to build Joxa itself. bootstrapping takes a
+    %% specialized framework that this plugin does not provide.
+    case AppName of
+        joxa ->
+            ?INFO("Refusing to build Joxa itself~n", []),
+            ok;
+        _ ->
+            build_jxa(Config, "src", "ebin")
+    end.
 
 -spec pre_eunit(rebar_config:config(), file:filename()) -> ok.
 pre_eunit(Config, _AppFIle) ->
@@ -46,8 +55,9 @@ pre_eunit(Config, _AppFIle) ->
 build_jxa(Config, Src, OutDir) ->
     %% Convert simple extension to proper regex
     Files = rebar_utils:find_files(Src, ".*\\.jxa$"),
+    check_existing(Config, OutDir, Files).
 
-check_existing(_Config, _Outdir, []) ->
+check_existing(_Config, _OutDir, []) ->
     %% No files to compile, all is good
     ok;
 check_existing(Config, OutDir, Files) ->
@@ -64,10 +74,10 @@ check_existing(Config, OutDir, Files) ->
                    "~n", []),
             rebar_utils:abort("*** MISSING JOXA COMPILER ***~n", []);
         _ ->
-            do_build(Config, Outdir, Files)
+            do_build(Config, OutDir, Files)
     end.
 
-do_build(Config, Outdir, Files) ->
+do_build(Config, OutDir, Files) ->
     Opts0 = rebar_config:get_list(Config, joxa_opts, []),
     Opts1 =
         case proplists:is_defined(outdir, Opts0) of
