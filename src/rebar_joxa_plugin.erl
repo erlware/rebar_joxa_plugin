@@ -46,6 +46,11 @@ pre_eunit(Config, _AppFIle) ->
 build_jxa(Config, Src, OutDir) ->
     %% Convert simple extension to proper regex
     Files = rebar_utils:find_files(Src, ".*\\.jxa$"),
+
+check_existing(_Config, _Outdir, []) ->
+    %% No files to compile, all is good
+    ok;
+check_existing(Config, OutDir, Files) ->
     case code:which('joxa-compiler') of
         non_existing ->
             ?ERROR("~n"
@@ -59,18 +64,21 @@ build_jxa(Config, Src, OutDir) ->
                    "~n", []),
             rebar_utils:abort("*** MISSING JOXA COMPILER ***~n", []);
         _ ->
-            Opts0 = rebar_config:get_list(Config, joxa_opts, []),
-            Opts1 =
-                case proplists:is_defined(outdir, Opts0) of
-                    true ->
-                        Opts0;
-                    false ->
-                        [{outdir, OutDir} | Opts0]
-                end,
-            case 'joxa-concurrent-compiler':'do-compile'(Files, Opts1) of
-                {error, _} ->
-                    ?ABORT("build failure", []);
-                ok ->
-                    ok
-            end
+            do_build(Config, Outdir, Files)
+    end.
+
+do_build(Config, Outdir, Files) ->
+    Opts0 = rebar_config:get_list(Config, joxa_opts, []),
+    Opts1 =
+        case proplists:is_defined(outdir, Opts0) of
+            true ->
+                Opts0;
+            false ->
+                [{outdir, OutDir} | Opts0]
+        end,
+    case 'joxa-concurrent-compiler':'do-compile'(Files, Opts1) of
+        {error, _} ->
+            ?ABORT("build failure", []);
+        ok ->
+            ok
     end.
