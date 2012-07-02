@@ -1,0 +1,8 @@
+%% -*- mode: erlang; -*-
+{application, rebar_joxa_plugin,
+ [{description, "rebar plugin for compiling joxa source code"},
+  {vsn, "0.0.1"},
+  {registered, []},
+  {applications, [kernel,
+                  stdlib,
+                  joxa]}]}.
