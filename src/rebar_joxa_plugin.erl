@@ -44,12 +44,12 @@ compile(Config, AppFile) ->
             ?INFO("Refusing to build Joxa itself~n", []),
             ok;
         _ ->
-            build_jxa(Config, "src", "ebin")
+            build_jxa(Config, ["src"], "ebin")
     end.
 
 -spec pre_eunit(rebar_config:config(), file:filename()) -> ok.
 pre_eunit(Config, _AppFIle) ->
-    build_jxa(Config, "test", ".eunit").
+    build_jxa(Config, ["src", "test"], ".eunit").
 
 -spec build_jxa(rebar_config:config(), [file:filename()], file:filename()) -> term().
 build_jxa(Config, Srcs, OutDir) ->
