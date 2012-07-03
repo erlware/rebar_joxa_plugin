@@ -1,7 +1,6 @@
 .*
 *.beam
-ebin/joxa.app
-joxa
+ebin/*.app
 deps
 _build
 erl_crash.dump
