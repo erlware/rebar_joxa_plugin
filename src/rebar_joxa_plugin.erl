@@ -91,7 +91,7 @@ do_build(Config, OutDir, Files) ->
         end,
     case 'joxa-concurrent-compiler':'do-compile'(Files, Opts1) of
         {error, _} ->
-            ?ABORT("build failure", []);
+            ?ABORT("build failure~n", []);
         ok ->
             ok
     end.
