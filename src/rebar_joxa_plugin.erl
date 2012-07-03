@@ -51,10 +51,13 @@ compile(Config, AppFile) ->
 pre_eunit(Config, _AppFIle) ->
     build_jxa(Config, "test", ".eunit").
 
--spec build_jxa(rebar_config:config(), file:filename(), file:filename()) -> term().
-build_jxa(Config, Src, OutDir) ->
+-spec build_jxa(rebar_config:config(), [file:filename()], file:filename()) -> term().
+build_jxa(Config, Srcs, OutDir) ->
     %% Convert simple extension to proper regex
-    Files = rebar_utils:find_files(Src, ".*\\.jxa$"),
+    Files = lists:foldl(fun(Src, Acc) ->
+                                rebar_utils:find_files(Src, ".*\\.jxa$") ++ Acc
+                        end, [], Srcs),
+
     check_existing(Config, OutDir, Files).
 
 check_existing(_Config, _OutDir, []) ->
