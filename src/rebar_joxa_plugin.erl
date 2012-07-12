@@ -81,6 +81,7 @@ check_existing(Config, OutDir, Files) ->
     end.
 
 do_build(Config, OutDir, Files) ->
+    code:add_patha(OutDir),
     Opts0 = rebar_config:get_list(Config, joxa_opts, []),
     Opts1 =
         case proplists:is_defined(outdir, Opts0) of
