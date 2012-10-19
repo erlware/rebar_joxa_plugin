@@ -33,10 +33,10 @@ ifeq ($(REBAR),)
 $(error "Rebar not available on this system")
 endif
 
-.PHONY: all compile doc clean test dialyzer typer shell distclean pdf \
+.PHONY: all compile doc clean test typer shell distclean pdf \
 	get-deps rebuild
 
-all: compile dialyzer test
+all: compile test
 
 # =============================================================================
 # Rules to build the system
@@ -60,18 +60,6 @@ ct: compile
 
 test: compile eunit
 
-$(DEPS_PLT):
-	@echo Building local plt at $(DEPS_PLT)
-	@echo
-	dialyzer --output_plt $(DEPS_PLT) --build_plt \
-	   --apps erts kernel stdlib -r deps
-
-dialyzer: $(DEPS_PLT)
-	dialyzer --plt $(DEPS_PLT) --fullpath -Wrace_conditions \
-	-pa $(CURDIR)/ebin --src src
-
-typer:
-	typer --plt $(DEPS_PLT) -r ./src
 
 shell: get-deps compile
 # You often want *rebuilt* rebar tests to be available to the
